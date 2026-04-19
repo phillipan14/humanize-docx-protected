@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.docx
+*.doc
+*_humanized.docx
+.DS_Store
+.venv/
+venv/
+.env
