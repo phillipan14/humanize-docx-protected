@@ -7,23 +7,30 @@ come back unchanged.
 Paragraphs skipped entirely:
   - Empty / whitespace-only
   - Headings (based on Word style containing "Heading")
-  - Any paragraph inside the "References" / "Bibliography" / "Appendix D" sections
+  - Any paragraph inside the "References" / "Bibliography" / "Appendix D/E" sections
   - Paragraphs that are primarily URL / DOI / file-path
   - Very short paragraphs (< 20 words)
-  - Paragraphs dominated by citations (>30% of tokens are citations)
+  - Citation-heavy paragraphs (>3 citations, or citation coverage >20% of chars)
+  - Pricing-heavy paragraphs (>2 dollar-amount sequences)
+  - [FIGURE / TABLE] insertion markers and placeholder text
 
 Within each translatable paragraph:
-  1. Replace proper nouns with placeholders (§1§, §2§, ...) that translators won't paraphrase
-  2. Replace (Author, Year) citations with placeholders
-  3. Replace URLs / DOIs with placeholders
-  4. Roundtrip translate EN -> zh-CN -> ko -> EN
-  5. Restore all placeholders
+  1. Replace URLs, APA citations, interview citations with ZKTK####ZK tokens
+  2. Replace proper nouns with the same token format (word-boundary matched,
+     one token per unique term — repeat mentions share the same token)
+  3. Replace dollar amounts and years last
+  4. Roundtrip translate EN -> zh-CN -> ko -> EN via Google Translate
+  5. Collapse any consecutive duplicate tokens the translator may have emitted
+  6. Restore all tokens to originals; clean up any orphan token patterns
 
 Progress is saved every 5 paragraphs; use --resume to continue after interruption.
 
 Usage:
-    python3 humanize_protected.py "Capstone Draft v3.docx"
-    python3 humanize_protected.py "Capstone Draft v3.docx" --resume
+    pip install deep-translator python-docx
+    python3 humanize_protected.py "your_document.docx"
+    python3 humanize_protected.py "your_document.docx" --resume
+
+Extend PROTECTED_TERMS below with proper nouns unique to your document.
 """
 import sys, time, random, re
 from pathlib import Path
